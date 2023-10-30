@@ -1,0 +1,2 @@
+# curriculai
+AI curriculum helper.
