@@ -1,59 +1,170 @@
-import dash
+from dash import Dash, Input, Output, State, dcc, html, no_update
 import dash_bootstrap_components as dbc
-import dash_core_components as dcc
-import dash_html_components as html
-from dash.dependencies import Input, Output
+import pdfkit
+import dash_ag_grid as dag
+import dash_mantine_components as dmc
+from dash_iconify import DashIconify
+import pandas as pd
+import dotenv
+from datetime import datetime, date
 
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.FLATLY])
 
-app.layout = html.Div([
-    html.H1("curriculAI", style={'textAlign': 'center'}),
-    dcc.Tabs([
-        dcc.Tab(label='Edit Curriculum', children=[
-            dbc.Row([
-                dbc.Col(html.Div("Class name"), width=4),
-                dbc.Col(html.Div("Teachers"), width=4),
-                dbc.Col(html.Div("Week of"), width=4),
-            ]),
-            dbc.Row([
-                dbc.Col(dbc.Input(value='Captains', type='text'), width=4),
-                dbc.Col(dbc.Input(value='Ms. Josselyn & Mrs. Riece', type='text'), width=4),
-                dbc.Col(dcc.DatePickerSingle(), width=4),
-            ]),
-            html.Br(),
-            dbc.Row([
-                dbc.Col(html.Div("Theme", style={'textAlign': 'center'}), width=12),
-            ]),
-            dbc.Row([
-                dbc.Col(dbc.Input(value='Trick or treat shenanigans', type='text', style={'width': '50%'}), style={'textAlign': 'center'}, width=12),
-            ]),
-            html.Br(),
-            # Repeat this pattern for each day
-            *[
-                dbc.Row([
-                    dbc.Col(html.Div(f'Day {i+1}'), width=12),
-                ]),
-                dbc.Row([
-                    dbc.Col(html.Div("Activities"), width=6),
-                    dbc.Col(dbc.Input(type='text'), width=5),
-                    dbc.Col(dbc.Button("Get Help", color="primary"), width=1),
-                ]),
-                dbc.Row([
-                    dbc.Col(html.Div("Skills"), width=6),
-                    dbc.Col(dbc.Input(type='text'), width=5),
-                    dbc.Col(dbc.Button("Get Help", color="primary"), width=1),
-                ]),
-                html.Hr(),
-            ] for i in range(5)
-        ]),
-        dcc.Tab(label='Print Curriculum', children=[
-            html.Div("coming soon")
-        ]),
-        dcc.Tab(label='Draft Email', children=[
-            html.Div("coming soon")
-        ]),
-    ])
-], style={'margin': 'auto', 'width': '80%'})
+style = {
+    "border": f"0px solid {dmc.theme.DEFAULT_COLORS['indigo'][4]}",
+    "textAlign": "center",
+}
+
+
+app = Dash(
+    __name__,
+    external_stylesheets=[
+        # include google fonts
+        "https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;900&display=swap"
+    ],
+    title="CurriculAI",
+    update_title="CurriculAI | Loading...",
+    assets_folder="assets",
+    include_assets_files=True,
+)
+
+
+header = dmc.Center(
+    html.Div(
+        "CurriculAI",
+        style={
+            "fontSize": 40,
+            "fontWeight": 900,
+            "color": dmc.theme.DEFAULT_COLORS["indigo"][4],
+            "margin": 0,
+        },
+    )
+    # html.A(
+    #     dmc.Image(
+    #         src="https://raw.githubusercontent.com/chatgpt/chart/9ff8b9b96f01a5ee7091ee5e69a2795381bf5031/docs/assets/chartgpt_logo.svg",
+    #         alt="ChartGPT Logo",
+    #         width=300,
+    #         m=20,
+    #         caption="Plot your data using GPT",
+    #     ),
+    #     href="https://github.com/chatgpt/chart",
+    #     style={"textDecoration": "none"},
+    # )
+)
+
+
+body = dmc.Tabs(
+    children=[
+        dmc.TabsList(
+            [
+                dmc.Tab("Class", value="class", icon=DashIconify(icon="tabler:chart-bar")),
+                dmc.Tab("Curriculum", value="curriculum", icon=DashIconify(icon="tabler:book")),
+                dmc.Tab("Skills", value="skills", icon=DashIconify(icon="tabler:star")),
+                dmc.Tab("Print", value="print", icon=DashIconify(icon="tabler:printer")),
+                dmc.Tab("Email", value="email", icon=DashIconify(icon="tabler:mail")),
+            ],
+            position="center"
+        ),
+        dmc.TabsPanel(
+            value="class",
+            children=[
+                dmc.Grid(
+                    children=[
+                        dmc.Col(html.Div(
+                            children=[
+                                dmc.TextInput(
+                                    id="class-name",
+                                    label="Class:",
+                                    value="Captains",
+                                    style={"width": 200})
+                                ],
+                            style=style), span=4),
+                        dmc.Col(html.Div(
+                            children=[
+                                dmc.TextInput(
+                                    id="teachers",
+                                    label="Teachers:",
+                                    value="Ms. Josselin & Mrs. Riece",
+                                    style={"width": 200},
+                                ),
+                                ],
+                            style=style), span=4),
+                        dmc.Col(html.Div(
+                            children=[
+                                dmc.DatePicker(
+                                    id="week-of",
+                                    label="Week of",
+                                    value=datetime.now().date(),
+                                    dropdownPosition="bottom-start",
+                                    style={
+                                        "width": 200
+                                    },
+                                ),
+                                ],
+                            style=style), span=4),
+                    ],
+                    gutter="xl",
+                    justify="center",
+                ),
+
+                dmc.Grid(
+                    children=[
+                        dmc.Col(html.Div(
+                            children=[
+                                dmc.TextInput(
+                                    id="theme",
+                                    label="Theme:",
+                                    value="What are you doing this week?",
+                                    style={"width": 200},
+                                ),
+                                ],
+                            style=style), span=12),
+                        ],
+                    gutter="xl",
+                    justify="center",
+                ),
+            ],
+        ),
+        dmc.TabsPanel(
+            "Messages tab content",
+            value="curriculum"
+        ),
+        dmc.TabsPanel("Settings tab content", value="skills"),
+    ],
+    color="red",
+    orientation="horizontal",
+)
+
+
+page = [
+    dcc.Store(id="dataset-store", storage_type="local"),
+    dmc.Container(
+        [
+            dmc.Stack(
+                [
+                    header,
+                    body,
+                ]
+            ),
+        ]
+    ),
+]
+
+
+app.layout = dmc.MantineProvider(
+    id="mantine-provider",
+    theme={
+        "fontFamily": "'Inter', sans-serif",
+        "colorScheme": "light",
+        "primaryColor": "dark",
+        "defaultRadius": "md",
+        "white": "#fff",
+        "black": "#404040",
+    },
+    withGlobalStyles=True,
+    withNormalizeCSS=True,
+    children=page,
+    inherit=True,
+)
 
 
 if __name__ == '__main__':
