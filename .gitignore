@@ -1,0 +1,6 @@
+# Environments
+.direnv/
+.env
+.venv
+env/
+venv*/
