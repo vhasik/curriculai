@@ -14,6 +14,97 @@ style = {
     "textAlign": "center",
 }
 
+heading_style = {
+    "textAlign": "left"
+}
+
+# fmt: off
+swatch1 = [
+    "#25262b", "#868e96", "#fa5252", "#e64980", "#be4bdb", "#7950f2", "#4c6ef5",
+    "#228be6", "#15aabf", "#12b886", "#40c057", "#82c91e", "#fab005", "#fd7e14"
+]
+
+swatch2 = [
+    "gray",
+    "red",
+    "pink",
+    "grape",
+    "violet",
+    "indigo",
+    "blue",
+    "lime",
+    "yellow",
+    "orange",
+]
+
+colors = {
+    "heading1": "orange",
+    "heading2": "indigo",
+    "heading3": "green",
+    "text1": "#e64980",
+    "text2": "#82c91e",
+    "text3": "#7950f2",
+}
+# fmt: on
+
+
+def daily_activity(day):
+    day_id = day.lower()[:3]
+
+    return dmc.Grid([
+        # ACTIVITY
+        dmc.Col(html.Div([
+            dmc.Text(f"{day}: ", size="lg", color=colors["heading1"], underline=True), ],
+            style=heading_style), span=2),
+        dmc.Col(html.Div([
+            dmc.Textarea(id=f"{day_id}-activity", placeholder="Enter activity", autosize=True), ],
+            style=style), span=9),
+        dmc.Col(html.Div([
+            dmc.ActionIcon(
+                DashIconify(icon="arcticons:openai-chatgpt"),
+                size="lg", color=colors["heading1"], variant="filled", id=f"{day_id}-a-gpt", n_clicks=0), ],
+            style=style), span=1),
+
+        # SKILLS
+        dmc.Col(html.Div([
+            dmc.Text(f"Skills: ", size="lg", color=colors["heading2"], underline=False), ],
+            style=heading_style), span=2),
+        dmc.Col(html.Div([
+            dmc.Textarea(
+                id=f"{day_id}-skills", placeholder="Enter skills", autosize=True),],
+            style=style), span=9),
+        dmc.Col(html.Div([
+            dmc.ActionIcon(
+                DashIconify(icon="arcticons:openai-chatgpt"),
+                size="lg", color=colors["heading2"], variant="filled", id=f"{day_id}-s-gpt", n_clicks=0), ],
+            style=style), span=1),
+
+        # SPACE
+        dmc.Col(html.Div([dmc.Space(h=10)]), span=12),
+    ],
+        gutter="xl",
+        justify="center",
+    )
+
+
+def print_layout_for_day(day):
+    day_id = day.lower()[:3]
+    return dmc.Grid([
+        dmc.Col(html.Div([
+            dmc.Text(f"{day} Activity:", size="lg", color=colors["heading1"], underline=True),
+            html.Div(id=f"print-{day_id}-activity", style=style),
+        ], style=style), span=4),
+        dmc.Col(html.Div([
+            dmc.Text(f"{day} Skills:", size="lg", color=colors["heading1"], underline=True),
+            html.Div(id=f"print-{day_id}-skills", style=style),
+        ], style=style), span=4),
+    ])
+
+
+days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]  # Add more days if needed
+day_layouts = [daily_activity(day) for day in days]
+print_layouts = [print_layout_for_day(day) for day in days]
+
 
 app = Dash(
     __name__,
@@ -38,100 +129,114 @@ header = dmc.Center(
             "margin": 0,
         },
     )
-    # html.A(
-    #     dmc.Image(
-    #         src="https://raw.githubusercontent.com/chatgpt/chart/9ff8b9b96f01a5ee7091ee5e69a2795381bf5031/docs/assets/chartgpt_logo.svg",
-    #         alt="ChartGPT Logo",
-    #         width=300,
-    #         m=20,
-    #         caption="Plot your data using GPT",
-    #     ),
-    #     href="https://github.com/chatgpt/chart",
-    #     style={"textDecoration": "none"},
-    # )
 )
 
 
-body = dmc.Tabs(
-    children=[
-        dmc.TabsList(
-            [
-                dmc.Tab("Class", value="class", icon=DashIconify(icon="tabler:chart-bar")),
-                dmc.Tab("Curriculum", value="curriculum", icon=DashIconify(icon="tabler:book")),
-                dmc.Tab("Skills", value="skills", icon=DashIconify(icon="tabler:star")),
-                dmc.Tab("Print", value="print", icon=DashIconify(icon="tabler:printer")),
-                dmc.Tab("Email", value="email", icon=DashIconify(icon="tabler:mail")),
-            ],
-            position="center"
-        ),
-        dmc.TabsPanel(
-            value="class",
-            children=[
-                dmc.Grid(
-                    children=[
-                        dmc.Col(html.Div(
-                            children=[
-                                dmc.TextInput(
-                                    id="class-name",
-                                    label="Class:",
-                                    value="Captains",
-                                    style={"width": 200})
-                                ],
-                            style=style), span=4),
-                        dmc.Col(html.Div(
-                            children=[
-                                dmc.TextInput(
-                                    id="teachers",
-                                    label="Teachers:",
-                                    value="Ms. Josselin & Mrs. Riece",
-                                    style={"width": 200},
-                                ),
-                                ],
-                            style=style), span=4),
-                        dmc.Col(html.Div(
-                            children=[
-                                dmc.DatePicker(
-                                    id="week-of",
-                                    label="Week of",
-                                    value=datetime.now().date(),
-                                    dropdownPosition="bottom-start",
-                                    style={
-                                        "width": 200
-                                    },
-                                ),
-                                ],
-                            style=style), span=4),
-                    ],
-                    gutter="xl",
-                    justify="center",
-                ),
+body = dmc.Tabs([
+    dmc.TabsList([
+        dmc.Tab("Curriculum", value="curriculum", icon=DashIconify(icon="tabler:book")),
+        dmc.Tab("Skills", value="skills", icon=DashIconify(icon="tabler:star")),
+        dmc.Tab("Print", value="print", icon=DashIconify(icon="tabler:printer")),
+        dmc.Tab("Email", value="email", icon=DashIconify(icon="tabler:mail")),
+    ], position="center",),
 
-                dmc.Grid(
-                    children=[
-                        dmc.Col(html.Div(
-                            children=[
-                                dmc.TextInput(
-                                    id="theme",
-                                    label="Theme:",
-                                    value="What are you doing this week?",
-                                    style={"width": 200},
-                                ),
-                                ],
-                            style=style), span=12),
-                        ],
-                    gutter="xl",
-                    justify="center",
+    # CLASS INFO
+    dmc.TabsPanel([
+        dmc.Space(h=20),
+
+        dmc.Grid([
+            dmc.Col(html.Div([
+                dmc.TextInput(
+                    id="class-name",
+                    label="Class:",
+                    value="Captains"
                 ),
-            ],
+            ], style=style), span=4),
+            dmc.Col(html.Div([
+                dmc.TextInput(
+                    id="teachers",
+                    label="Teachers:",
+                    value="Ms. Josselin & Mrs. Riece",
+                ),
+            ], style=style), span=4),
+            dmc.Col(html.Div([
+                dmc.DatePicker(
+                    id="week-of",
+                    label="Week of",
+                    value=datetime.now().date(),
+                    dropdownPosition="bottom-start",
+                ),
+            ], style=style), span=4),
+            dmc.Col(html.Div([
+                dmc.TextInput(
+                    id="theme",
+                    label="Theme:",
+                    value="What are you doing this week?",
+                ),],
+                style=style), span=12),
+                ],
+            gutter="xl",
+            justify="center",
         ),
-        dmc.TabsPanel(
-            "Messages tab content",
-            value="curriculum"
+
+        dmc.Space(h=40),
+
+        *day_layouts,
+
+        dmc.Space(h=40),
+
+        dmc.Grid([
+            dmc.Col(html.Div([
+                dmc.Text(f"Day color: ", size="lg", color=colors["heading2"], underline=False), ],
+                style=heading_style), span=2),
+            dmc.Col(html.Div([
+                dmc.ColorPicker(swatches=swatch2, swatchesPerRow=10, withPicker=False),
+            ], style=style), span=10),
+            dmc.Col(html.Div([
+                dmc.Text(f"Skill color: ", size="lg", color=colors["heading2"], underline=False), ],
+                style=heading_style), span=2),
+            dmc.Col(html.Div([
+                dmc.ColorPicker(swatches=swatch2, swatchesPerRow=10, withPicker=False),
+            ], style=style), span=10),],
         ),
-        dmc.TabsPanel("Settings tab content", value="skills"),
+
+    ],
+        value="curriculum",
+    ),
+
+    dmc.TabsPanel("Settings tab content", value="skills"),
+
+    dmc.TabsPanel([
+        dmc.Space(h=20),
+        dmc.Grid([
+            dmc.Col(html.Div([
+                dmc.Text("Class Name:", size="lg", color=colors["heading1"], underline=True),
+                html.Div(id="print-class-name", style=style),  # Add this line
+            ], style=style), span=4),
+            dmc.Col(html.Div([
+                dmc.Text("Teachers:", size="lg", color=colors["heading1"], underline=True),
+                html.Div(id="print-teachers", style=style),  # Add this line
+            ], style=style), span=4),
+            dmc.Col(html.Div([
+                dmc.Text("Week Of:", size="lg", color=colors["heading1"], underline=True),
+                html.Div(id="print-week-of", style=style),  # Add this line
+            ], style=style), span=4),
+            dmc.Col(html.Div([
+                dmc.Text("Theme:", size="lg", color=colors["heading1"], underline=True),
+                html.Div(id="print-theme", style=style),  # Add this line
+            ], style=style), span=12),
+        ]),
+        dmc.Space(h=20),
+        *print_layouts,  # Unpack the list of print layouts
+        dmc.Space(h=20),
+    ], value="print"),
+
+    dmc.TabsPanel("Messages tab content", value="email"),
+
     ],
     color="red",
     orientation="horizontal",
+    value="curriculum",
 )
 
 
@@ -165,6 +270,32 @@ app.layout = dmc.MantineProvider(
     children=page,
     inherit=True,
 )
+
+
+@app.callback(
+    [Output("print-class-name", "children"),
+     Output("print-teachers", "children"),
+     Output("print-week-of", "children"),
+     Output("print-theme", "children")],
+    [Input("class-name", "value"),
+     Input("teachers", "value"),
+     Input("week-of", "date"),
+     Input("theme", "value")]
+)
+def update_print_tab(class_name, teachers, week_of, theme):
+    return class_name, teachers, week_of, theme
+
+
+@app.callback(
+    # Outputs for each day's activity and skills
+    [Output(f"print-{day.lower()[:3]}-activity", "children") for day in days] +
+    [Output(f"print-{day.lower()[:3]}-skills", "children") for day in days],
+    # Inputs for each day's activity and skills
+    [Input(f"{day.lower()[:3]}-activity", "value") for day in days] +
+    [Input(f"{day.lower()[:3]}-skills", "value") for day in days]
+)
+def update_print_tab_for_activity_and_skills(*args):
+    return args
 
 
 if __name__ == '__main__':
