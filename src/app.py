@@ -7,7 +7,14 @@ from dash_iconify import DashIconify
 import pandas as pd
 import dotenv
 from datetime import datetime, date
+from dotenv import load_dotenv
+import os
+import openai
 
+
+# Load the environment variables from the .env file
+load_dotenv()
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 style = {
     "border": f"0px solid {dmc.theme.DEFAULT_COLORS['indigo'][4]}",
@@ -24,18 +31,7 @@ swatch1 = [
     "#228be6", "#15aabf", "#12b886", "#40c057", "#82c91e", "#fab005", "#fd7e14"
 ]
 
-swatch2 = [
-    "gray",
-    "red",
-    "pink",
-    "grape",
-    "violet",
-    "indigo",
-    "blue",
-    "lime",
-    "yellow",
-    "orange",
-]
+swatch2 = ["gray", "red", "pink", "grape", "violet", "indigo", "blue", "lime", "yellow", "orange"]
 
 colors = {
     "heading1": "orange",
@@ -48,61 +44,89 @@ colors = {
 # fmt: on
 
 
-def daily_activity(day):
-    day_id = day.lower()[:3]
-
-    return dmc.Grid([
-        # ACTIVITY
-        dmc.Col(html.Div([
-            dmc.Text(f"{day}: ", size="lg", color=colors["heading1"], underline=True), ],
-            style=heading_style), span=2),
-        dmc.Col(html.Div([
-            dmc.Textarea(id=f"{day_id}-activity", placeholder="Enter activity", autosize=True), ],
-            style=style), span=9),
-        dmc.Col(html.Div([
-            dmc.ActionIcon(
-                DashIconify(icon="arcticons:openai-chatgpt"),
-                size="lg", color=colors["heading1"], variant="filled", id=f"{day_id}-a-gpt", n_clicks=0), ],
-            style=style), span=1),
-
-        # SKILLS
-        dmc.Col(html.Div([
-            dmc.Text(f"Skills: ", size="lg", color=colors["heading2"], underline=False), ],
-            style=heading_style), span=2),
-        dmc.Col(html.Div([
-            dmc.Textarea(
-                id=f"{day_id}-skills", placeholder="Enter skills", autosize=True),],
-            style=style), span=9),
-        dmc.Col(html.Div([
-            dmc.ActionIcon(
-                DashIconify(icon="arcticons:openai-chatgpt"),
-                size="lg", color=colors["heading2"], variant="filled", id=f"{day_id}-s-gpt", n_clicks=0), ],
-            style=style), span=1),
-
-        # SPACE
-        dmc.Col(html.Div([dmc.Space(h=10)]), span=12),
-    ],
-        gutter="xl",
-        justify="center",
-    )
+# def daily_activity(day):
+#     day_id = day.lower()[:3]
+#
+#     return dmc.Grid([
+#         # ACTIVITY
+#         dmc.Col(html.Div([
+#             dmc.Text(f"{day}: ", size="lg", color=colors["heading1"], underline=True), ],
+#             style=heading_style), span=2),
+#         dmc.Col(html.Div([
+#             dmc.Textarea(id=f"{day_id}-activity", placeholder="Enter activity", autosize=True), ],
+#             style=style), span=9),
+#         dmc.Col(html.Div([
+#             dmc.ActionIcon(
+#                 DashIconify(icon="arcticons:openai-chatgpt"),
+#                 size="lg", color=colors["heading1"], variant="filled", id=f"{day_id}-a-gpt", n_clicks=0), ],
+#             style=style), span=1),
+#
+#         # SKILLS
+#         dmc.Col(html.Div([
+#             dmc.Text(f"Skills: ", size="lg", color=colors["heading2"], underline=False), ],
+#             style=heading_style), span=2),
+#         dmc.Col(html.Div([
+#             dmc.Textarea(
+#                 id=f"{day_id}-skills", placeholder="Enter skills", autosize=True),],
+#             style=style), span=9),
+#         dmc.Col(html.Div([
+#             dmc.ActionIcon(
+#                 DashIconify(icon="arcticons:openai-chatgpt"),
+#                 size="lg", color=colors["heading2"], variant="filled", id=f"{day_id}-s-gpt", n_clicks=0), ],
+#             style=style), span=1),
+#
+#         # SPACE
+#         dmc.Col(html.Div([dmc.Space(h=10)]), span=12),
+#     ],
+#         gutter="xl",
+#         justify="center",
+#     )
 
 
 def print_layout_for_day(day):
     day_id = day.lower()[:3]
     return dmc.Grid([
         dmc.Col(html.Div([
-            dmc.Text(f"{day} Activity:", size="lg", color=colors["heading1"], underline=True),
+            dmc.Text(f"{day}:", size="lg", color=colors["heading1"], underline=True),
             html.Div(id=f"print-{day_id}-activity", style=style),
         ], style=style), span=4),
         dmc.Col(html.Div([
-            dmc.Text(f"{day} Skills:", size="lg", color=colors["heading1"], underline=True),
+            dmc.Text(f"Skills:", size="lg", color=colors["heading2"], underline=True),
             html.Div(id=f"print-{day_id}-skills", style=style),
         ], style=style), span=4),
     ])
 
 
+def use_gpt(instructions, prompt_text):
+    # Load the prompt from the text file
+    with open(instructions, 'r', encoding='utf-8') as file:
+        instructions_text = file.read().strip()
+
+    # # Load the prompt from the text file
+    # with open(prompt, 'r', encoding='utf-8') as file:
+    #     prompt_text = file.read().strip()
+
+    response = openai.ChatCompletion.create(
+        model="gpt-4",
+        messages=[
+            {
+                "role": "user",
+                "content": instructions_text + prompt_text
+            }
+        ],
+        temperature=0,
+        max_tokens=4096,
+        top_p=1,
+        frequency_penalty=0,
+        presence_penalty=0
+    )
+
+    # Return the response from OpenAI
+    return response.choices[0].message['content']
+
+
 days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]  # Add more days if needed
-day_layouts = [daily_activity(day) for day in days]
+# day_layouts = [daily_activity(day) for day in days]
 print_layouts = [print_layout_for_day(day) for day in days]
 
 
@@ -123,7 +147,7 @@ header = dmc.Center(
     html.Div(
         "CurriculAI",
         style={
-            "fontSize": 40,
+            "fontSize": 30,
             "fontWeight": 900,
             "color": dmc.theme.DEFAULT_COLORS["indigo"][4],
             "margin": 0,
@@ -135,12 +159,12 @@ header = dmc.Center(
 body = dmc.Tabs([
     dmc.TabsList([
         dmc.Tab("Curriculum", value="curriculum", icon=DashIconify(icon="tabler:book")),
-        dmc.Tab("Skills", value="skills", icon=DashIconify(icon="tabler:star")),
+        # dmc.Tab("Skills", value="skills", icon=DashIconify(icon="tabler:star")),
         dmc.Tab("Print", value="print", icon=DashIconify(icon="tabler:printer")),
         dmc.Tab("Email", value="email", icon=DashIconify(icon="tabler:mail")),
     ], position="center",),
 
-    # CLASS INFO
+    # CLASS INFO ====================================
     dmc.TabsPanel([
         dmc.Space(h=20),
 
@@ -168,10 +192,11 @@ body = dmc.Tabs([
                 ),
             ], style=style), span=4),
             dmc.Col(html.Div([
-                dmc.TextInput(
+                dmc.Textarea(
                     id="theme",
                     label="Theme:",
-                    value="What are you doing this week?",
+                    placeholder="What are you doing this week?",
+                    autosize=True,
                 ),],
                 style=style), span=12),
                 ],
@@ -181,38 +206,70 @@ body = dmc.Tabs([
 
         dmc.Space(h=40),
 
-        *day_layouts,
+        dmc.Grid([
+            dmc.Col(html.Div([
+                dmc.Textarea(
+                    id="activities",
+                    label="Activities:",
+                    placeholder="Enter list of activities like this:"
+                                "\nMonday: Some activity."
+                                "\nTuesday: Another activity."
+                                "\nWednesday: Cool acitvity."
+                                "\nThursday: Smart activity."
+                                "\nFriday: Last activity.",
+                    minRows=7,
+                    autosize=True), ],
+                style=style), span=12),
+        ],),
 
-        dmc.Space(h=40),
+        dmc.Space(h=20),
+
+        dmc.Group(
+            position="left",
+            spacing="xl",
+            children=[
+                dmc.Button(
+                    "Generate skills",
+                    id="generate-skills",
+                    color="indigo",
+                    variant="filled",
+                    size="sm",
+                    leftIcon=DashIconify(icon="ri:openai-fill"),
+                ),
+                dmc.Loader(color="indigo", size="sm", variant="dots", id="loader-skills", style={"display": "none"}),
+                html.Div([
+                    dmc.Text("thinking, please wait..."),
+                ],
+                    id="loading-skills",
+                    style={"display": "none"}  # Initially hidden
+                )
+            ]
+        ),
 
         dmc.Grid([
             dmc.Col(html.Div([
-                dmc.Text(f"Day color: ", size="lg", color=colors["heading2"], underline=False), ],
-                style=heading_style), span=2),
-            dmc.Col(html.Div([
-                dmc.ColorPicker(swatches=swatch2, swatchesPerRow=10, withPicker=False),
-            ], style=style), span=10),
-            dmc.Col(html.Div([
-                dmc.Text(f"Skill color: ", size="lg", color=colors["heading2"], underline=False), ],
-                style=heading_style), span=2),
-            dmc.Col(html.Div([
-                dmc.ColorPicker(swatches=swatch2, swatchesPerRow=10, withPicker=False),
-            ], style=style), span=10),],
-        ),
-
+                dmc.Textarea(
+                    id="skills-text",
+                    label="Skills:",
+                    placeholder="Let ChatGPT generate skills for you! Click the button above.",
+                    minRows=7,
+                    autosize=True),
+            ],
+                style=style), span=12),
+        ], gutter="xl", justify="center"),
     ],
         value="curriculum",
     ),
-
     dmc.TabsPanel("Settings tab content", value="skills"),
 
+    # PRINT ====================================
     dmc.TabsPanel([
         dmc.Space(h=20),
         dmc.Grid([
             dmc.Col(html.Div([
                 dmc.Text("Class Name:", size="lg", color=colors["heading1"], underline=True),
                 html.Div(id="print-class-name", style=style),  # Add this line
-            ], style=style), span=4),
+            ], style={"fontFamily": "Roboto"}), span=4),
             dmc.Col(html.Div([
                 dmc.Text("Teachers:", size="lg", color=colors["heading1"], underline=True),
                 html.Div(id="print-teachers", style=style),  # Add this line
@@ -231,8 +288,37 @@ body = dmc.Tabs([
         dmc.Space(h=20),
     ], value="print"),
 
-    dmc.TabsPanel("Messages tab content", value="email"),
+    # EMAIL ====================================
+    dmc.TabsPanel([
+        dmc.Space(h=20),
 
+        dmc.Group([
+            dmc.Button(
+                "Generate email",
+                id="generate-email",
+                color="indigo",
+                variant="filled",
+                size="sm",
+                fullWidth=False,
+                leftIcon=DashIconify(icon="ri:openai-fill"),
+            ),
+            dmc.Loader(color="indigo", size="sm", variant="dots", id="loader-email", style={"display": "none"}),
+            html.Div([
+                dmc.Text("thinking, please wait..."),],
+                id="loading-email",
+                style={"display": "block"}  # Initially hidden
+            ),],),
+        dmc.Space(h=10),
+        dmc.Grid([
+            dmc.Col(html.Div([
+                dmc.Textarea(
+                    id=f"email-text",
+                    placeholder="Let ChatGPT generate an email for you! Click the button above.",
+                    minRows=25,
+                    autosize=True), ],
+                style={"textAlign": "left"}), span=12),
+        ],),
+    ], value="email"),
     ],
     color="red",
     orientation="horizontal",
@@ -287,15 +373,96 @@ def update_print_tab(class_name, teachers, week_of, theme):
 
 
 @app.callback(
-    # Outputs for each day's activity and skills
-    [Output(f"print-{day.lower()[:3]}-activity", "children") for day in days] +
-    [Output(f"print-{day.lower()[:3]}-skills", "children") for day in days],
-    # Inputs for each day's activity and skills
-    [Input(f"{day.lower()[:3]}-activity", "value") for day in days] +
-    [Input(f"{day.lower()[:3]}-skills", "value") for day in days]
+    [Output("loader-skills", "style"),
+     Output("loading-skills", "style")],
+    [Input("generate-skills", "n_clicks")]
 )
-def update_print_tab_for_activity_and_skills(*args):
-    return args
+def show_loader(n_clicks):
+    if n_clicks:
+        return {"display": "inline-block"}, {"display": "inline-block"}
+    return {"display": "none"}, {"display": "none"}
+
+@app.callback(
+    Output("skills-text", "value"),
+    [Input("generate-skills", "n_clicks"),
+     Input("activities", "value")]
+)
+def generate_skills(n_clicks, activities_text):
+    if n_clicks:
+        generated_skills = use_gpt("prompt-skills.txt", activities_text)
+        print(f"Activities text: {activities_text}")
+        return generated_skills
+    return no_update
+
+
+# @app.callback(
+#     [Output("skills-text", "value"),
+#      Output("loading-skills", "style"),
+#      Output("loader-skills", "style")],  # Output for the loader's style
+#     [Input("generate-skills", "n_clicks"),
+#      State("activities", "value")]
+# )
+# def generate_skills(n_clicks, activities_text):
+#     if n_clicks:
+#         # Show the loader and the loading message
+#         loading_style = {"display": "block"}
+#         loader_style = {"display": "block"}
+#
+#         # Use the "use_gpt" function to generate skills
+#         generated_skills = use_gpt("prompt-skills.txt", activities_text)
+#         print(f"Activities text: {activities_text}")
+#
+#         # Once skills are generated, hide the loader and the loading message
+#         return generated_skills, {"display": "none"}, {"display": "none"}
+#     # If the button hasn't been clicked, don't change anything
+#     return no_update, {"display": "none"}, {"display": "none"}  # Keep both loader and text hidden
+
+
+@app.callback(
+    [Output("loader-email", "style"),
+     Output("loading-email", "style")],
+    [Input("generate-email", "n_clicks")]
+)
+def show_loader(n_clicks):
+    if n_clicks:
+        return {"display": "inline-block"}, {"display": "inline-block"}
+    return {"display": "none"}, {"display": "none"}
+
+
+@app.callback(
+    Output("email-text", "value"),
+    [Input("generate-email", "n_clicks"),
+     Input("activities", "value")]
+)
+def generate_email(n_clicks, activities_text):
+    if n_clicks:
+        generated_text = use_gpt("prompt-email.txt", activities_text)
+        print(f"Activities text: {activities_text}")
+        return generated_text
+    return no_update
+
+
+# @app.callback(
+#     [Output("email-text", "value"),
+#      Output("loading-email", "style"),
+#      Output("loader-email", "style")],  # Output for the loader's style
+#     [Input("generate-email", "n_clicks"),
+#      State("activities", "value")]
+# )
+# def generate_email(n_clicks, activities_text):
+#     if n_clicks:
+#         # Show the loader and the loading message
+#         loading_style = {"display": "block"}
+#         loader_style = {"display": "block"}
+#
+#         # Use the "use_gpt" function to generate the email
+#         generated_text = use_gpt("prompt-email.txt", activities_text)
+#         print(f"Activities text: {activities_text}")
+#
+#         # Once the email is generated, hide the loader and the loading message
+#         return generated_text, {"display": "none"}, {"display": "none"}
+#     # If the button hasn't been clicked, don't change anything
+#     return no_update, {"display": "none"}, {"display": "none"}  # Keep both loader and text hidden
 
 
 if __name__ == '__main__':

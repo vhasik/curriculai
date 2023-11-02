@@ -1,0 +1,39 @@
+I am a kindergarten teacher that needs help with emailing parents, informing them of the week ahead.
+I will give you information about the weekly activities, and I will want you to help me write an email
+that is fun and engaging for the parents to read. Make it to the point but positive and engaging and
+sprinkle in some cute emojis.
+For example, I may give you the following prompt:
+Theme: Down on the Farm - Farms are how we get food, let’s explore their importance!
+Monday: INDIGENOUS PEOPLE’S DAY AKA CLOSED
+Tuesday: Captains will complete an apple tree trace and learn activity and a “who lives on the farm wheel.” They will create worm in apple puppets.
+Wednesday: Captains will complete a phonics workbook activity and learn about the lifecycle of a chicken and complete a cut and paste activity.
+Thursday: Captains will complete a farm animal puppet show craft and play farm bingo.
+Friday: Captains will complete a paper plate garden craft and a tractor craft using popsicle sticks.
+And I will want you to give me the following answer:
+Subject: 🐷 Down on the Farm: A Peek Into This Week! 🐔
+
+Dear Parents,
+
+Hope you had a fantastic weekend! This week, we're excitedly stepping into the world of farms with our "Down on the Farm" theme 🌾. Starting Tuesday, our Captains will delve into apple tree tracing, discover "who lives on the farm" with a special wheel, and craft playful worm-in-apple puppets 🍎🐛. Wednesday brings phonics fun and a journey through the chicken's lifecycle 🐤. On Thursday, we're spotlighting our farm animal puppet show and a round of farm bingo 🐄🐓. To wrap up the week, Friday will be all about creating a vibrant paper plate garden and assembling a popsicle stick tractor 🌻🚜. We're eager to embark on this farm-tastic adventure, making moo-velous memories along the way 🐮. Let's harvest some learning and fun!
+
+Warm regards,
+[Your Name/Your School's Name]
+
+Another example of a prompt I may give you:
+Theme: Halloween and fire safety week
+Monday: Captains will complete a mathematics workbook activity and a fire safety introduction activity.
+Tuesday: Captains will learn all about pumpkins, complete a “label the pumpkin” craft, and Begin halloween goodie bags.
+Wednesday: Captains will complete a phonics workbook activity and make halloween themed kinetic sand.
+Thursday: Captains will complete a letter e craft and my shape fire truck activity.
+Friday: Captains will complete a pumpkin volcano experiment and make a fire safety snack.
+And I will want you to give me the following answer:
+Subject: 🎃 A Bewitching Blend of Halloween and Fire Safety Awaits! 🔥
+
+Dear Parents,
+
+Buckle up, because this week promises to be a spook-tacular blend of Halloween fun and essential fire safety lessons! 🎃🚒 On Monday, our Captains will conjure up their math skills with workbook activities and light up their knowledge on fire safety 🔢🔥. Tuesday will see us "carving" out some time to learn about our gourd-geous pumpkins, label them, and set the stage for our Halloween treat bags 🎃🛍️. By Witching Wednesday, we're diving broomstick-deep into phonics and crafting with some hauntingly fun Halloween kinetic sand 📚🧙‍♀️. Thrilling Thursday promises a crafty venture with the letter 'e' and a shape-filled fire truck activity 🚒✏️. And to wrap it all up, Friday will erupt with excitement as we witness a pumpkin volcano experiment and craft a fire safety snack that's sure to be smokin' delicious! 🌋🍪
+
+Here's to a week filled with thrilling discoveries and fang-tastic fun!
+
+Warm regards,
+[Your Name/Your School's Name]
