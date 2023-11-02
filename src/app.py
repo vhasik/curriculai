@@ -383,7 +383,7 @@ def show_loader(n_clicks):
     return {"display": "none"}, {"display": "none"}
 
 @app.callback(
-    Output("skills-text", "value"),
+    [Output("skills-text", "value"),],  # Output for the loader's style
     [Input("generate-skills", "n_clicks"),
      Input("activities", "value")]
 )
@@ -392,30 +392,8 @@ def generate_skills(n_clicks, activities_text):
         generated_skills = use_gpt("prompt-skills.txt", activities_text)
         print(f"Activities text: {activities_text}")
         return generated_skills
+    # If the button hasn't been clicked, don't change anything
     return no_update
-
-
-# @app.callback(
-#     [Output("skills-text", "value"),
-#      Output("loading-skills", "style"),
-#      Output("loader-skills", "style")],  # Output for the loader's style
-#     [Input("generate-skills", "n_clicks"),
-#      State("activities", "value")]
-# )
-# def generate_skills(n_clicks, activities_text):
-#     if n_clicks:
-#         # Show the loader and the loading message
-#         loading_style = {"display": "block"}
-#         loader_style = {"display": "block"}
-#
-#         # Use the "use_gpt" function to generate skills
-#         generated_skills = use_gpt("prompt-skills.txt", activities_text)
-#         print(f"Activities text: {activities_text}")
-#
-#         # Once skills are generated, hide the loader and the loading message
-#         return generated_skills, {"display": "none"}, {"display": "none"}
-#     # If the button hasn't been clicked, don't change anything
-#     return no_update, {"display": "none"}, {"display": "none"}  # Keep both loader and text hidden
 
 
 @app.callback(
@@ -430,7 +408,7 @@ def show_loader(n_clicks):
 
 
 @app.callback(
-    Output("email-text", "value"),
+    [Output("email-text", "value"),],  # Output for the loader's style
     [Input("generate-email", "n_clicks"),
      Input("activities", "value")]
 )
@@ -438,31 +416,10 @@ def generate_email(n_clicks, activities_text):
     if n_clicks:
         generated_text = use_gpt("prompt-email.txt", activities_text)
         print(f"Activities text: {activities_text}")
+        # Once the email is generated, hide the loader and the loading message
         return generated_text
-    return no_update
-
-
-# @app.callback(
-#     [Output("email-text", "value"),
-#      Output("loading-email", "style"),
-#      Output("loader-email", "style")],  # Output for the loader's style
-#     [Input("generate-email", "n_clicks"),
-#      State("activities", "value")]
-# )
-# def generate_email(n_clicks, activities_text):
-#     if n_clicks:
-#         # Show the loader and the loading message
-#         loading_style = {"display": "block"}
-#         loader_style = {"display": "block"}
-#
-#         # Use the "use_gpt" function to generate the email
-#         generated_text = use_gpt("prompt-email.txt", activities_text)
-#         print(f"Activities text: {activities_text}")
-#
-#         # Once the email is generated, hide the loader and the loading message
-#         return generated_text, {"display": "none"}, {"display": "none"}
-#     # If the button hasn't been clicked, don't change anything
-#     return no_update, {"display": "none"}, {"display": "none"}  # Keep both loader and text hidden
+    # If the button hasn't been clicked, don't change anything
+    return no_update  # Keep both loader and text hidden
 
 
 if __name__ == '__main__':
