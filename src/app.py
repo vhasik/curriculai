@@ -382,8 +382,9 @@ def show_loader(n_clicks):
         return {"display": "inline-block"}, {"display": "inline-block"}
     return {"display": "none"}, {"display": "none"}
 
+
 @app.callback(
-    [Output("skills-text", "value"),],  # Output for the loader's style
+    Output("skills-text", "value"),  # Output for the loader's style
     [Input("generate-skills", "n_clicks"),
      Input("activities", "value")]
 )
@@ -408,7 +409,7 @@ def show_loader(n_clicks):
 
 
 @app.callback(
-    [Output("email-text", "value"),],  # Output for the loader's style
+    Output("email-text", "value"),  # Output for the loader's style
     [Input("generate-email", "n_clicks"),
      Input("activities", "value")]
 )
