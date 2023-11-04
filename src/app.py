@@ -1,4 +1,4 @@
-from dash import Dash, Input, Output, State, dcc, html, no_update
+from dash import Dash, Input, Output, State, dcc, html, no_update, callback
 import dash_bootstrap_components as dbc
 import pdfkit
 import dash_ag_grid as dag
@@ -42,45 +42,6 @@ colors = {
     "text3": "#7950f2",
 }
 # fmt: on
-
-
-# def daily_activity(day):
-#     day_id = day.lower()[:3]
-#
-#     return dmc.Grid([
-#         # ACTIVITY
-#         dmc.Col(html.Div([
-#             dmc.Text(f"{day}: ", size="lg", color=colors["heading1"], underline=True), ],
-#             style=heading_style), span=2),
-#         dmc.Col(html.Div([
-#             dmc.Textarea(id=f"{day_id}-activity", placeholder="Enter activity", autosize=True), ],
-#             style=style), span=9),
-#         dmc.Col(html.Div([
-#             dmc.ActionIcon(
-#                 DashIconify(icon="arcticons:openai-chatgpt"),
-#                 size="lg", color=colors["heading1"], variant="filled", id=f"{day_id}-a-gpt", n_clicks=0), ],
-#             style=style), span=1),
-#
-#         # SKILLS
-#         dmc.Col(html.Div([
-#             dmc.Text(f"Skills: ", size="lg", color=colors["heading2"], underline=False), ],
-#             style=heading_style), span=2),
-#         dmc.Col(html.Div([
-#             dmc.Textarea(
-#                 id=f"{day_id}-skills", placeholder="Enter skills", autosize=True),],
-#             style=style), span=9),
-#         dmc.Col(html.Div([
-#             dmc.ActionIcon(
-#                 DashIconify(icon="arcticons:openai-chatgpt"),
-#                 size="lg", color=colors["heading2"], variant="filled", id=f"{day_id}-s-gpt", n_clicks=0), ],
-#             style=style), span=1),
-#
-#         # SPACE
-#         dmc.Col(html.Div([dmc.Space(h=10)]), span=12),
-#     ],
-#         gutter="xl",
-#         justify="center",
-#     )
 
 
 def print_layout_for_day(day):
@@ -236,27 +197,19 @@ body = dmc.Tabs([
                     size="sm",
                     leftIcon=DashIconify(icon="ri:openai-fill"),
                 ),
-                dmc.Loader(color="indigo", size="sm", variant="dots", id="loader-skills", style={"display": "none"}),
-                html.Div([
-                    dmc.Text("thinking, please wait..."),
-                ],
-                    id="loading-skills",
-                    style={"display": "none"}  # Initially hidden
-                )
             ]
         ),
-
-        dmc.Grid([
-            dmc.Col(html.Div([
+        dcc.Loading(
+            id="loading-skills-text",
+            type="circle",
+            children=[
                 dmc.Textarea(
                     id="skills-text",
                     label="Skills:",
                     placeholder="Let ChatGPT generate skills for you! Click the button above.",
                     minRows=7,
-                    autosize=True),
-            ],
-                style=style), span=12),
-        ], gutter="xl", justify="center"),
+                    autosize=True), ],
+        )
     ],
         value="curriculum",
     ),
@@ -309,15 +262,16 @@ body = dmc.Tabs([
                 style={"display": "block"}  # Initially hidden
             ),],),
         dmc.Space(h=10),
-        dmc.Grid([
-            dmc.Col(html.Div([
+        dcc.Loading(
+            id="loading-email-text",
+            type="default",
+            children=[
                 dmc.Textarea(
-                    id=f"email-text",
+                    id="email-text",
                     placeholder="Let ChatGPT generate an email for you! Click the button above.",
                     minRows=25,
                     autosize=True), ],
-                style={"textAlign": "left"}), span=12),
-        ],),
+        )
     ], value="email"),
     ],
     color="red",
@@ -332,7 +286,7 @@ page = [
         [
             dmc.Stack(
                 [
-                    header,
+                    # header,
                     body,
                 ]
             ),
@@ -358,35 +312,30 @@ app.layout = dmc.MantineProvider(
 )
 
 
-@app.callback(
-    [Output("print-class-name", "children"),
-     Output("print-teachers", "children"),
-     Output("print-week-of", "children"),
-     Output("print-theme", "children")],
-    [Input("class-name", "value"),
-     Input("teachers", "value"),
-     Input("week-of", "date"),
-     Input("theme", "value")]
+@callback(
+    Output("print-class-name", "children"),
+    Output("print-teachers", "children"),
+    Output("print-week-of", "children"),
+    Output("print-theme", "children"),
+    Input("class-name", "value"),
+    Input("teachers", "value"),
+    Input("week-of", "date"),
+    Input("theme", "value"),
+    # Input('activities', 'value'),
+    # Input('skills-text', 'value'),
+    # Input('day-color-picker', 'value'),
+    # Input('activity-color-picker', 'value'),
+    # Input('skills-label-color-picker', 'value'),
+    # Input('skills-description-color-picker', 'value')
 )
 def update_print_tab(class_name, teachers, week_of, theme):
     return class_name, teachers, week_of, theme
 
 
-@app.callback(
-    [Output("loader-skills", "style"),
-     Output("loading-skills", "style")],
-    [Input("generate-skills", "n_clicks")]
-)
-def show_loader(n_clicks):
-    if n_clicks:
-        return {"display": "inline-block"}, {"display": "inline-block"}
-    return {"display": "none"}, {"display": "none"}
-
-
-@app.callback(
+@callback(
     Output("skills-text", "value"),  # Output for the loader's style
-    [Input("generate-skills", "n_clicks"),
-     Input("activities", "value")]
+    Input("generate-skills", "n_clicks"),
+    Input("activities", "value")
 )
 def generate_skills(n_clicks, activities_text):
     if n_clicks:
@@ -395,17 +344,6 @@ def generate_skills(n_clicks, activities_text):
         return generated_skills
     # If the button hasn't been clicked, don't change anything
     return no_update
-
-
-@app.callback(
-    [Output("loader-email", "style"),
-     Output("loading-email", "style")],
-    [Input("generate-email", "n_clicks")]
-)
-def show_loader(n_clicks):
-    if n_clicks:
-        return {"display": "inline-block"}, {"display": "inline-block"}
-    return {"display": "none"}, {"display": "none"}
 
 
 @app.callback(
