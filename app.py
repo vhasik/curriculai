@@ -12,9 +12,6 @@ import os
 import openai
 
 
-app = Dash(__name__)
-server = app.server
-
 # Load the environment variables from the .env file
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -152,7 +149,7 @@ app = Dash(
     assets_folder="assets",
     include_assets_files=True,
 )
-
+server = app.server
 
 header = dmc.Center(
     html.Div(
@@ -362,7 +359,7 @@ page = [
     ),
 ]
 
-
+"""APP LAYOUT"""
 app.layout = dmc.MantineProvider(
     id="mantine-provider",
     theme={
