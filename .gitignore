@@ -1,7 +1,5 @@
-src/.env
 .env
 .venv
 env/
 venv*/
 .idea
-src/.env
