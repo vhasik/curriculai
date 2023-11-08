@@ -12,6 +12,9 @@ import os
 import openai
 
 
+app = Dash(__name__)
+server = app.server
+
 # Load the environment variables from the .env file
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -469,3 +472,4 @@ def generate_email(n_clicks, activities_text):
 
 if __name__ == '__main__':
     app.run_server(debug=True)
+
