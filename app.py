@@ -1,20 +1,24 @@
 from dash import Dash, Input, Output, State, dcc, html, no_update, callback
 import dash_bootstrap_components as dbc
-import pdfkit
-import dash_ag_grid as dag
 import dash_mantine_components as dmc
+from dash.exceptions import PreventUpdate
+# from dash_extensions import Download
+# from dash_extensions.snippets import send_bytes
 from dash_iconify import DashIconify
 import pandas as pd
 import dotenv
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from dotenv import load_dotenv
 import os
 import openai
-
+import flask
+import print_doc
 
 # Load the environment variables from the .env file
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
+
+""" STYLES """
 
 style = {
     "border": f"0px solid {dmc.theme.DEFAULT_COLORS['indigo'][4]}",
@@ -43,76 +47,13 @@ colors = {
 }
 # fmt: on
 
-
-# def print_layout_for_day(day):
-#     day_id = day.lower()[:3]
-#     return dmc.Grid([
-#         dmc.Col(html.Div([
-#             dmc.Text(f"{day}:", size="lg", color=colors["heading1"], underline=True),
-#             html.Div(id=f"print-{day_id}-activity", style=style),
-#         ], style=style), span=4),
-#         dmc.Col(html.Div([
-#             dmc.Text(f"Skills:", size="lg", color=colors["heading2"], underline=True),
-#             html.Div(id=f"print-{day_id}-skills", style=style),
-#         ], style=style), span=4),
-#     ])
-
-def print_layout_for_day(day, day_color, activity_color, skills_label_color, skills_description_color):
-    day_id = day.lower()[:3]
-    return dmc.Grid([
-        dmc.Col(html.Div([
-            dmc.Text(f"{day}:", size="lg", color=day_color, underline=True, id=f"print-{day_id}-day"),
-            html.Div(id=f"print-{day_id}-activity", style=style),
-        ], style=style), span=4),
-        dmc.Col(html.Div([
-            dmc.Text(f"Skills:", size="lg", color=skills_label_color, underline=True, id=f"print-{day_id}-skills-label"),
-            html.Div(id=f"print-{day_id}-skills", style=style),
-        ], style=style), span=4),
-    ])
-
-
-def print_layout(class_name, teachers, week_range, theme, activities, skills):
-    layout = dmc.Grid(
-        children=[
-            dmc.Col(html.Div([
-                dmc.Text("Class Name:", size="lg", color=colors["heading1"], underline=True),
-                html.Div(class_name, style=style),
-            ], style={"fontFamily": "Roboto"}), span=4),
-            dmc.Col(html.Div([
-                dmc.Text("Teachers:", size="lg", color=colors["heading1"], underline=True),
-                html.Div(teachers, style=style),
-            ], style=style), span=4),
-            dmc.Col(html.Div([
-                dmc.Text("Week Of:", size="lg", color=colors["heading1"], underline=True),
-                html.Div(week_range, style=style),
-            ], style=style), span=4),
-            dmc.Col(html.Div([
-                dmc.Text("Theme:", size="lg", color=colors["heading1"], underline=True),
-                html.Div(theme, style=style),
-            ], style=style), span=12),
-            dmc.Col(html.Div([
-                dmc.Text("Activities:", size="lg", color=colors["heading2"], underline=True),
-                html.Div(activities, style=style),
-            ], style=style), span=12),
-            dmc.Col(html.Div([
-                dmc.Text("Skills:", size="lg", color=colors["heading2"], underline=True),
-                html.Div(skills, style=style),
-            ], style=style), span=12),
-        ],
-        gutter="xl",
-        justify="center",
-    )
-    return layout
+""" HELPER FUNCTIONS """
 
 
 def use_gpt(instructions, prompt_text):
     # Load the prompt from the text file
     with open(instructions, 'r', encoding='utf-8') as file:
         instructions_text = file.read().strip()
-
-    # # Load the prompt from the text file
-    # with open(prompt, 'r', encoding='utf-8') as file:
-    #     prompt_text = file.read().strip()
 
     response = openai.ChatCompletion.create(
         model="gpt-4",
@@ -133,10 +74,45 @@ def use_gpt(instructions, prompt_text):
     return response.choices[0].message['content']
 
 
-days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]  # Add more days if needed
-# day_layouts = [daily_activity(day) for day in days]
-# print_layouts = [print_layout(day) for day in days]
+def process_activities(input_text):
+    days = []
+    activities = []
 
+    # Split the input text on newlines
+    entries = input_text.split('\n')
+    print(f"Entries: {entries}")
+
+    for entry in entries:
+        print(f"Entry: {entry}")
+        # Split each entry on the colon
+        parts = entry.split(':', 1)  # Split only on the first colon
+
+        if len(parts) == 2:
+            day, activity = parts
+            days.append(day.strip())  # Remove any extra whitespace
+            activities.append(activity.strip())
+
+    return days, activities
+
+
+def process_skills(input_text):
+    skills = []
+
+    # Split the input text on newlines
+    entries = input_text.split('\n')
+
+    for entry in entries:
+        # Split each entry on the colon
+        parts = entry.split(':', 1)  # Split only on the first colon
+
+        if len(parts) == 2:
+            skill = parts[1]
+            skills.append(skill.strip())  # Remove any extra whitespace
+
+    return skills
+
+
+""" DASH APP """
 
 app = Dash(
     __name__,
@@ -144,8 +120,8 @@ app = Dash(
         # include google fonts
         "https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;900&display=swap"
     ],
-    title="CurriculAI",
-    update_title="CurriculAI | Loading...",
+    title="CurriculA1",
+    update_title="CurriculA1 | Loading...",
     assets_folder="assets",
     include_assets_files=True,
 )
@@ -153,7 +129,7 @@ server = app.server
 
 header = dmc.Center(
     html.Div(
-        "CurriculAI",
+        "CurriculA1",
         style={
             "fontSize": 30,
             "fontWeight": 900,
@@ -163,18 +139,15 @@ header = dmc.Center(
     )
 )
 
-
 body = dmc.Tabs([
     dmc.TabsList([
         dmc.Tab("Curriculum", value="curriculum", icon=DashIconify(icon="tabler:book")),
-        dmc.Tab("Print", value="print", icon=DashIconify(icon="tabler:printer")),
         dmc.Tab("Email", value="email", icon=DashIconify(icon="tabler:mail")),
-    ], position="center",),
+    ], position="center", ),
 
     # CLASS INFO ====================================
     dmc.TabsPanel([
         dmc.Space(h=20),
-
         dmc.Grid([
             dmc.Col(html.Div([
                 dmc.TextInput(
@@ -204,15 +177,13 @@ body = dmc.Tabs([
                     label="Theme:",
                     placeholder="What are you doing this week?",
                     autosize=True,
-                ),],
+                ), ],
                 style=style), span=12),
-                ],
+        ],
             gutter="xl",
             justify="center",
         ),
-
         dmc.Space(h=40),
-
         dmc.Grid([
             dmc.Col(html.Div([
                 dmc.Textarea(
@@ -227,7 +198,7 @@ body = dmc.Tabs([
                     minRows=7,
                     autosize=True), ],
                 style=style), span=12),
-        ],),
+        ], ),
 
         dmc.Space(h=20),
 
@@ -238,9 +209,7 @@ body = dmc.Tabs([
                 dmc.Button(
                     "Generate skills",
                     id="generate-skills",
-                    color="indigo",
-                    variant="filled",
-                    size="sm",
+                    color="indigo", variant="filled", size="sm",
                     leftIcon=DashIconify(icon="ri:openai-fill"),
                 ),
             ]
@@ -256,61 +225,26 @@ body = dmc.Tabs([
                     placeholder="Let ChatGPT generate skills for you! Click the button above.",
                     minRows=7,
                     autosize=True), ],
-        )
+        ),
+
+        dmc.Space(h=20),
+
+        dmc.Button(
+            "Create document",
+            id="download-button",
+            color="indigo", variant="filled", size="sm",
+            leftIcon=DashIconify(icon="mdi:download"),
+        ),
+        # dcc.Download(id="download-file"),
+        # dcc.Link("Download", id="download-button", href="", style={"display": "none"}, ),
+        html.A("Download",
+               id="download-file",
+               href="",
+               download="",
+               style={"display": "none"}, )
     ],
         value="curriculum",
     ),
-    dmc.TabsPanel("Settings tab content", value="skills"),
-
-    # PRINT ====================================
-    dmc.TabsPanel([
-        # Add color picker inputs
-        # dmc.Grid([
-        #     dmc.Col(html.Div([
-        #         html.Label('Day Label Color:'),
-        #         dmc.ColorPicker(id='day-color-picker', swatches=swatch1),  # updated
-        #     ], style=style), span=3),
-        #     dmc.Col(html.Div([
-        #         html.Label('Activity Description Color:'),
-        #         dmc.ColorPicker(id='activity-color-picker', swatches=swatch1),  # updated
-        #     ], style=style), span=3),
-        #     dmc.Col(html.Div([
-        #         html.Label('Skills Label Color:'),
-        #         dmc.ColorPicker(id='skills-label-color-picker', swatches=swatch1),  # updated
-        #     ], style=style), span=3),
-        #     dmc.Col(html.Div([
-        #         html.Label('Skills Description Color:'),
-        #         dmc.ColorPicker(id='skills-description-color-picker', swatches=swatch1),  # updated
-        #     ], style=style), span=3),
-        # ]),
-        # Rest of print area
-        dmc.Space(h=20),
-        # dmc.Grid([
-        #     dmc.Col(html.Div([
-        #         dmc.Text("Class Name:", size="lg", color=colors["heading1"], underline=True),
-        #         html.Div(id="print-class-name", style=style),  # Add this line
-        #     ], style={"fontFamily": "Roboto"}), span=4),
-        #     dmc.Col(html.Div([
-        #         dmc.Text("Teachers:", size="lg", color=colors["heading1"], underline=True),
-        #         html.Div(id="print-teachers", style=style),  # Add this line
-        #     ], style=style), span=4),
-        #     dmc.Col(html.Div([
-        #         dmc.Text("Week Of:", size="lg", color=colors["heading1"], underline=True),
-        #         html.Div(id="print-week-of", style=style),  # Add this line
-        #     ], style=style), span=4),
-        #     dmc.Col(html.Div([
-        #         dmc.Text("Theme:", size="lg", color=colors["heading1"], underline=True),
-        #         html.Div(id="print-theme", style=style),  # Add this line
-        #     ], style=style), span=12),
-        # ]),
-        # dmc.Space(h=20),
-        # # *print_layouts,  # Unpack the list of print layouts
-        # dmc.Space(h=20),
-        # html.Div(id='print-layouts-container'),  # Add this div to hold the print_layouts
-
-        # Simplified print area
-        html.Div(id='print-layout-output'),
-    ], value="print"),
 
     # EMAIL ====================================
     dmc.TabsPanel([
@@ -325,7 +259,7 @@ body = dmc.Tabs([
                 size="sm",
                 fullWidth=False,
                 leftIcon=DashIconify(icon="ri:openai-fill"),
-            ),],),
+            ), ], ),
         dmc.Space(h=10),
         dcc.Loading(
             id="loading-email-text",
@@ -338,12 +272,11 @@ body = dmc.Tabs([
                     autosize=True), ],
         )
     ], value="email"),
-    ],
+],
     color="red",
     orientation="horizontal",
     value="curriculum",
 )
-
 
 page = [
     dcc.Store(id="dataset-store", storage_type="local"),
@@ -351,7 +284,7 @@ page = [
         [
             dmc.Stack(
                 [
-                    # header,
+                    header,
                     body,
                 ]
             ),
@@ -378,70 +311,21 @@ app.layout = dmc.MantineProvider(
 
 
 # @callback(
-#     Output("print-class-name", "children"),
-#     Output("print-teachers", "children"),
-#     Output("print-week-of", "children"),
-#     Output("print-theme", "children"),
-#     # Additional Outputs for day, activity, skills label, and skills text
-#     [Output(f"print-{day.lower()[:3]}-day", "style") for day in days] +
-#     [Output(f"print-{day.lower()[:3]}-activity", "style") for day in days] +
-#     [Output(f"print-{day.lower()[:3]}-skills-label", "style") for day in days] +
-#     [Output(f"print-{day.lower()[:3]}-skills", "style") for day in days],
-#     Input("class-name", "value"),
-#     Input("teachers", "value"),
-#     Input("week-of", "date"),
-#     Input("theme", "value"),
-#     # Additional Inputs for the color pickers
-#     Input("day-color-picker", "value"),
-#     Input("activity-color-picker", "value"),
-#     Input("skills-label-color-picker", "value"),
-#     Input("skills-description-color-picker", "value"),
+#     Output('download-file', 'style'),
+#     Input('download-button', 'n_clicks'),
+#     prevent_initial_call=True
 # )
-# def update_print_tab(
-#         class_name, teachers, week_of, theme,
-#         day_color, activity_color, skills_label_color, skills_description_color
-# ):
-#     print_layouts = [print_layout(day, day_color, activity_color, skills_label_color, skills_description_color) for day in days]
-#
-#     # Set the color styles for the day, activity, skills label, and skills text
-#     day_style = {"color": day_color["hex"]}
-#     activity_style = {"color": activity_color["hex"]}
-#     skills_label_style = {"color": skills_label_color["hex"]}
-#     skills_style = {"color": skills_description_color["hex"]}
-#
-#     return (
-#         class_name, teachers, week_of, theme,
-#         # Return the color styles for each day and text element
-#         *[day_style] * len(days),
-#         *[activity_style] * len(days),
-#         *[skills_label_style] * len(days),
-#         *[skills_style] * len(days),
-#         print_layouts
-#     )
-
-
-@callback(
-    Output("print-layout-output", "children"),
-    Input("class-name", "value"),
-    Input("teachers", "value"),
-    Input("week-of", "date"),
-    Input("theme", "value"),
-    Input("activities", "value"),
-    Input("skills-text", "value"),
-)
-def update_print_tab(class_name, teachers, week_of, theme, activities, skills):
-    if week_of is None:
-        week_range = "Unknown"
-    else:
-        week_range = f"{week_of.strftime('%B %d')} - {date.fromisoformat(week_of) + pd.Timedelta(days=4):%B %d, %Y}"
-    layout = print_layout(class_name, teachers, week_range, theme, activities, skills)
-    return layout
+# def show_download_link(n_clicks):
+#     if n_clicks:
+#         return {'display': 'block'}  # Make the link visible
+#     else:
+#         raise PreventUpdate
 
 
 @callback(
     Output("skills-text", "value"),  # Output for the loader's style
     Input("generate-skills", "n_clicks"),
-    Input("activities", "value")
+    State("activities", "value")
 )
 def generate_skills(n_clicks, activities_text):
     if n_clicks:
@@ -455,7 +339,7 @@ def generate_skills(n_clicks, activities_text):
 @callback(
     Output("email-text", "value"),  # Output for the loader's style
     Input("generate-email", "n_clicks"),
-    Input("activities", "value")
+    State("activities", "value")
 )
 def generate_email(n_clicks, activities_text):
     if n_clicks:
@@ -467,6 +351,51 @@ def generate_email(n_clicks, activities_text):
     return no_update  # Keep both loader and text hidden
 
 
-if __name__ == '__main__':
-    app.run_server(debug=True)
+"""DOWNLOAD DOCUMENT"""
 
+
+@callback(
+    Output('download-file', 'href'),
+    Output('download-file', 'download'),
+    Output('download-file', 'style'),
+    Input('download-button', 'n_clicks'),
+    State('class-name', 'value'),
+    State('teachers', 'value'),
+    State('week-of', 'value'),
+    State('theme', 'value'),
+    State('activities', 'value'),
+    State('skills-text', 'value'),
+    prevent_initial_call=True,
+)
+def update_href(n_clicks, class_name, teachers, week_of, theme, activities, skills):
+    if n_clicks is None:
+        raise PreventUpdate
+
+    # Check if any of the inputs are None and set default values
+    activities = activities if activities is not None else "Monday: No Activities"
+    skills = skills if skills is not None else "Monday Skills: No Skills"
+
+    days_list, activities_list = process_activities(activities)
+    skills_list = process_skills(skills)
+
+    # Call your script with the user input and return its path
+    new_doc_path = print_doc.generate_doc(
+        class_name, teachers, week_of,
+        theme, days_list, activities_list, skills_list)
+
+    # Use new_doc_path directly for the href attribute
+    # file_url = f"\{new_doc_path}"
+    file_name = os.path.basename(new_doc_path)
+    # file_url = flask.url_for('static', filename=new_doc_path)
+    file_url = f"/assets/{file_name}"
+
+    print(f"File URL: {file_url}")
+    print(f"File name: {file_name}")
+
+    link_style = {'display': 'block'}
+
+    return file_url, file_name, link_style
+
+
+if __name__ == '__main__':
+    app.run_server(debug=True, dev_tools_hot_reload=False)
