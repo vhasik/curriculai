@@ -229,19 +229,21 @@ body = dmc.Tabs([
 
         dmc.Space(h=20),
 
-        dmc.Button(
-            "Create document",
-            id="download-button",
-            color="indigo", variant="filled", size="sm",
-            leftIcon=DashIconify(icon="mdi:download"),
-        ),
-        # dcc.Download(id="download-file"),
-        # dcc.Link("Download", id="download-button", href="", style={"display": "none"}, ),
-        html.A("Download",
-               id="download-file",
-               href="",
-               download="",
-               style={"display": "none"}, )
+        dmc.Tooltip(
+            id="download-tooltip",
+            label="This button will be enabled once you generate skills.",
+            multiline=True, openDelay=500, closeDelay=500,
+            children=[
+                dmc.Button(
+                    "Download document",
+                    id="download-button",
+                    color="indigo", variant="filled", size="sm",
+                    leftIcon=DashIconify(icon="mdi:download"),
+                    disabled=True,
+                ),
+                dcc.Download(id="download-docx"),
+            ]
+        )
     ],
         value="curriculum",
     ),
@@ -293,6 +295,7 @@ page = [
 ]
 
 """APP LAYOUT"""
+
 app.layout = dmc.MantineProvider(
     id="mantine-provider",
     theme={
@@ -310,20 +313,13 @@ app.layout = dmc.MantineProvider(
 )
 
 
-# @callback(
-#     Output('download-file', 'style'),
-#     Input('download-button', 'n_clicks'),
-#     prevent_initial_call=True
-# )
-# def show_download_link(n_clicks):
-#     if n_clicks:
-#         return {'display': 'block'}  # Make the link visible
-#     else:
-#         raise PreventUpdate
+"""CALLBACKS"""
 
 
 @callback(
-    Output("skills-text", "value"),  # Output for the loader's style
+    Output("skills-text", "value"),
+    Output("download-button", "disabled"),
+    Output("download-tooltip", "label"),
     Input("generate-skills", "n_clicks"),
     State("activities", "value")
 )
@@ -331,9 +327,10 @@ def generate_skills(n_clicks, activities_text):
     if n_clicks:
         generated_skills = use_gpt("prompt-skills.txt", activities_text)
         print(f"Activities text: {activities_text}")
-        return generated_skills
+        tooltip_label = "Download your curriculum as a Word document."
+        return generated_skills, False, tooltip_label
     # If the button hasn't been clicked, don't change anything
-    return no_update
+    return no_update, no_update, no_update
 
 
 @callback(
@@ -351,13 +348,8 @@ def generate_email(n_clicks, activities_text):
     return no_update  # Keep both loader and text hidden
 
 
-"""DOWNLOAD DOCUMENT"""
-
-
 @callback(
-    Output('download-file', 'href'),
-    Output('download-file', 'download'),
-    Output('download-file', 'style'),
+    Output('download-docx', 'data'),
     Input('download-button', 'n_clicks'),
     State('class-name', 'value'),
     State('teachers', 'value'),
@@ -367,7 +359,7 @@ def generate_email(n_clicks, activities_text):
     State('skills-text', 'value'),
     prevent_initial_call=True,
 )
-def update_href(n_clicks, class_name, teachers, week_of, theme, activities, skills):
+def download_docx(n_clicks, class_name, teachers, week_of, theme, activities, skills):
     if n_clicks is None:
         raise PreventUpdate
 
@@ -384,17 +376,13 @@ def update_href(n_clicks, class_name, teachers, week_of, theme, activities, skil
         theme, days_list, activities_list, skills_list)
 
     # Use new_doc_path directly for the href attribute
-    # file_url = f"\{new_doc_path}"
     file_name = os.path.basename(new_doc_path)
-    # file_url = flask.url_for('static', filename=new_doc_path)
-    file_url = f"/assets/{file_name}"
+    file_url = f"./assets/{file_name}"
 
     print(f"File URL: {file_url}")
     print(f"File name: {file_name}")
 
-    link_style = {'display': 'block'}
-
-    return file_url, file_name, link_style
+    return dcc.send_file(file_url)
 
 
 if __name__ == '__main__':

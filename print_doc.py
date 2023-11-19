@@ -77,7 +77,7 @@ def generate_doc(class_name, teachers, input_date, theme, days, activities, skil
 
     # Load your template
     print("Loading template...")
-    template_path = os.path.join("templates", "curriculum_template.docx")
+    template_path = os.path.join("assets", "curriculum_template.docx")
     doc = Document(template_path)
 
     print("Creating document...")
