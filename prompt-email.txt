@@ -2,6 +2,7 @@ I am a kindergarten teacher that needs help with emailing parents, informing the
 I will give you information about the weekly activities, and I will want you to help me write an email
 that is fun and engaging for the parents to read. Make it to the point but positive and engaging and
 sprinkle in some cute emojis.
+
 For example, I may give you the following prompt:
 Theme: Down on the Farm - Farms are how we get food, let’s explore their importance!
 Monday: INDIGENOUS PEOPLE’S DAY AKA CLOSED
@@ -17,7 +18,6 @@ Dear Parents,
 Hope you had a fantastic weekend! This week, we're excitedly stepping into the world of farms with our "Down on the Farm" theme 🌾. Starting Tuesday, our Captains will delve into apple tree tracing, discover "who lives on the farm" with a special wheel, and craft playful worm-in-apple puppets 🍎🐛. Wednesday brings phonics fun and a journey through the chicken's lifecycle 🐤. On Thursday, we're spotlighting our farm animal puppet show and a round of farm bingo 🐄🐓. To wrap up the week, Friday will be all about creating a vibrant paper plate garden and assembling a popsicle stick tractor 🌻🚜. We're eager to embark on this farm-tastic adventure, making moo-velous memories along the way 🐮. Let's harvest some learning and fun!
 
 Warm regards,
-[Your Name/Your School's Name]
 
 Another example of a prompt I may give you:
 Theme: Halloween and fire safety week
@@ -36,4 +36,14 @@ Buckle up, because this week promises to be a spook-tacular blend of Halloween f
 Here's to a week filled with thrilling discoveries and fang-tastic fun!
 
 Warm regards,
-[Your Name/Your School's Name]
+
+Another example of an email:
+Hope everyone is buzzing with excitement for Halloween! 🎃 As the leaves fall and we gather around with our loved ones, this week we are diving deep into the theme: "I AM THANKFUL FOR MY FAMILY." 🌳💞
+
+On Monday, our Captains will dive into math magic and also craft their own Pumpkin Name masterpiece combined with some mesmerizing kinetic sand play. 🎃✨ Tuesday will be a spooky delight as we make a Halloween snack and adorn ourselves with a bat crown just in time for the festive evening! 🦇🍪 Midweek, on Wednesday, we'll be honing our phonics skills and then crafting a beautiful family "cactus" tree, highlighting each member that makes our families unique and strong. 🌵❤️ Thursday promises some vibrant fun as we paint with all shades of imagination in our Corn Color by Numbers and Corn Craft activities. 🌽🎨 To wrap up this week of gratitude, Friday will be about identifying patterns in the fall atmosphere and crafting with the foxy letter 'F'. 🍁🦊
+
+Let's embrace the season, cherish our families, and craft some unforgettable memories together! 🍂👨‍👩‍👧‍👦🍁
+
+Wishing you all a spellbinding Halloween and a week filled with gratitude! 🍁🎃💖
+
+Warmly,

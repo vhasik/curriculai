@@ -2,19 +2,22 @@ I am a kindergarten teacher that needs help with planning and outlining a weekly
 I will give you information about the weekly theme and the planned topics for each day, and I will
 want you to help me fill in what skills the children will learn by doing the activities. I will want the answers
 in simple bulleted lists, where each bullet is a list of skills corresponding to one day's activities.
+
 For example, I may give you the following prompt:
 Theme: Down on the Farm - Farms are how we get food, let’s explore their importance!
-Monday: INDIGENOUS PEOPLE’S DAY AKA CLOSED
+Monday: Indigenous' Peoples Day - AKA CLOSED
 Tuesday: Captains will complete an apple tree trace and learn activity and a “who lives on the farm wheel.” They will create worm in apple puppets.
 Wednesday: Captains will complete a phonics workbook activity and learn about the lifecycle of a chicken and complete a cut and paste activity.
 Thursday: Captains will complete a farm animal puppet show craft and play farm bingo.
 Friday: Captains will complete a paper plate garden craft and a tractor craft using popsicle sticks.
+
 And I will want you to give me the following answer:
 Monday skills: N/A
 Tuesday skills: Fine Motor Skills, Sensory Exploration, Artistic Expression, Cognitive Development, Focus and Attention
 Wednesday skills: Pencil Grasp, Fine Motor Skills, Problem solving, Concentration, Phonics,  Sensory Exploration, Artistic Expression, Language Development, Auditory Skills
 Thursday skills: Fine Motor Skills, Sensory Exploration, Artistic Expression, Cognitive Development, Spatial Awareness, Scientific Observation, Focus and Attention
 Friday skills: Fine Motor Skills, Letter Recognition, Focus and Attention, Cutting Skills, Logic, Mathematical Skills
+
 Another example of a prompt I may give you:
 Theme: Halloween and fire safety week
 Monday: Captains will complete a mathematics workbook activity and a fire safety introduction activity.
@@ -22,9 +25,25 @@ Tuesday: Captains will learn all about pumpkins, complete a “label the pumpkin
 Wednesday: Captains will complete a phonics workbook activity and make halloween themed kinetic sand.
 Thursday: Captains will complete a letter e craft and my shape fire truck activity.
 Friday: Captains will complete a pumpkin volcano experiment and make a fire safety snack.
+
 And I will want you to give me the following answer:
 Monday skills: Mathematical Reasoning, Fine Motor Skills, Artistic Expression, Sensory Exploration
 Tuesday skills: Fine Motor Skills, Artistic Expression, Creative Writing, Cognitive Development, Visual Perception
 Wednesday skills: Phonics, Letter Recognition, Fine Motor Skills, Artistic Expression, Cognitive Development
 Thursday skills: Mathematical Skills (Counting), Fine Motor Skills, Artistic Expression, Cognitive Development, Attention to Detail
 Friday skills: Fine Motor Skills (assembling goodie bags), Cognitive Development, Safety Awareness, Attention to Detail, Active Listening, Critical Thinking (understanding the importance of safety measures)
+
+Another example of a prompt I may give you:
+Theme: We are thankful for community helpers
+Monday: Captains will complete a mathematics workbook activity/number tracing worksheet/ a community helpers puzzle.
+Tuesday: Captains Will complete a community helpers worksheet and word dot tracing.
+Wednesday: Captains will complete a Phonics workbook activity,  a community helpers printable book, and community helper hats.
+Thursday:  Captains will complete A community helper spin the wheel and a paper plate car craft.
+Friday: captains will complete A “high five to community helpers” fingerpaint craft and a community helper dab sheet.
+
+And I will want you to give me the following answer:
+Monday skills: Mathematical Skills, Fine Motor Skills, Cognitive Development, Problem Solving, Spatial Awareness
+Tuesday skills: Fine Motor Skills, Letter Recognition, Cognitive Development, Visual Perception, Artistic Expression
+Wednesday skills: Phonics, Fine Motor Skills, Reading Comprehension, Artistic Expression, Dramatic Play
+Thursday skills: Fine Motor Skills, Cognitive Development, Artistic Expression, Decision Making, Color Recognition
+Friday skills: Fine Motor Skills, Sensory Exploration, Artistic Expression, Color Recognition, Hand-Eye Coordination
