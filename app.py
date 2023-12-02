@@ -80,10 +80,10 @@ def process_activities(input_text):
 
     # Split the input text on newlines
     entries = input_text.split('\n')
-    print(f"Entries: {entries}")
+    # print(f"Entries: {entries}")
 
     for entry in entries:
-        print(f"Entry: {entry}")
+        # print(f"Entry: {entry}")
         # Split each entry on the colon
         parts = entry.split(':', 1)  # Split only on the first colon
 
@@ -325,8 +325,9 @@ app.layout = dmc.MantineProvider(
 )
 def generate_skills(n_clicks, activities_text):
     if n_clicks:
-        generated_skills = use_gpt("prompt-skills.txt", activities_text)
-        print(f"Activities text: {activities_text}")
+        skills_prompt = os.path.join("data", "prompt-skills.txt")
+        generated_skills = use_gpt(skills_prompt, activities_text)
+        # print(f"Activities text: {activities_text}")
         tooltip_label = "Download your curriculum as a Word document."
         return generated_skills, False, tooltip_label
     # If the button hasn't been clicked, don't change anything
@@ -340,8 +341,9 @@ def generate_skills(n_clicks, activities_text):
 )
 def generate_email(n_clicks, activities_text):
     if n_clicks:
-        generated_text = use_gpt("prompt-email.txt", activities_text)
-        print(f"Activities text: {activities_text}")
+        email_prompt = os.path.join("data", "prompt-email.txt")
+        generated_text = use_gpt(email_prompt, activities_text)
+        # print(f"Activities text: {activities_text}")
         # Once the email is generated, hide the loader and the loading message
         return generated_text
     # If the button hasn't been clicked, don't change anything
@@ -377,10 +379,10 @@ def download_docx(n_clicks, class_name, teachers, week_of, theme, activities, sk
 
     # Use new_doc_path directly for the href attribute
     file_name = os.path.basename(new_doc_path)
-    file_url = f"./assets/{file_name}"
+    file_url = f"./data/{file_name}"
 
-    print(f"File URL: {file_url}")
-    print(f"File name: {file_name}")
+    # print(f"File URL: {file_url}")
+    # print(f"File name: {file_name}")
 
     return dcc.send_file(file_url)
 

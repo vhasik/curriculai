@@ -144,7 +144,7 @@ def generate_doc(class_name, teachers, input_date, theme, days, activities, skil
 
     print("Saving document...")
     # Save the document as a new file
-    new_doc_path = os.path.join("assets", f"curriculum_{date}.docx")
+    new_doc_path = os.path.join("data", f"curriculum_{date}.docx")
     doc.save(new_doc_path)
 
     return new_doc_path
