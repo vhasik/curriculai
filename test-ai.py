@@ -9,11 +9,11 @@ load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # Load the prompt from the text file
-with open('prompt-email.txt', 'r', encoding='utf-8') as file:
+with open('data/prompt-email.txt', 'r', encoding='utf-8') as file:
     prompt_prep = file.read().strip()
 
 # Load the prompt from the text file
-with open('prompt-test.txt', 'r', encoding='utf-8') as file:
+with open('data/prompt-test.txt', 'r', encoding='utf-8') as file:
     prompt_content = file.read().strip()
 
 response = openai.ChatCompletion.create(
